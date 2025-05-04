@@ -1,13 +1,14 @@
 const express = require('express')
-const main = require("./config/db")
-const authRouter=require("./routes/userAuth");
-const problemRouter=require("./routes/problemCreator")
-const redisClient = require('./config/redis');
+const main = require("./src/config/db")
+const authRouter=require("./src/routes/userAuth");
+const problemRouter=require("./src/routes/problemCreator")
+const redisClient = require('./src/config/redis');
 const cookieParser = require('cookie-parser');
 
 const app = express();
 require('dotenv').config();
 
+//inbuild middleware
 app.use(cookieParser());
 app.use(express.json());
 

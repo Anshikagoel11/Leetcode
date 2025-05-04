@@ -22,7 +22,7 @@ async function tokenVerifyMiddleware(req, res, next) {
         next();
     } catch (err) {
         console.log(err.message);
-        res.status(401).send('Invalid or expired token');
+        res.status(400).send('Invalid or expired token');
     }
 }
 

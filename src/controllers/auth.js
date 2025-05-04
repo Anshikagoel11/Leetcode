@@ -64,7 +64,7 @@ const logout = async(req,res)=>{
     redisClient.expireAt(`token:${token}`,payload.exp);
     
     res.clearCookie('token',null,{expires:new Date(Date.now())});
-    res.status(200).send('logout successfully')
+    res.status(204).send('logout successfully')
 }catch(err){
     res.status(400).send('Error occured: '+err)
 }

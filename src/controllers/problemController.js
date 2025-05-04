@@ -104,7 +104,7 @@ const foundProblem = await Problem.findById(id);
 if(!foundProblem){
     throw new Error("Problem not found")
 }
-res.status(201).send(foundProblem);
+res.status(200).send(foundProblem);
 }catch(err){
     res.status(400).send("error occured: " + err)
 }
@@ -116,7 +116,7 @@ const getAllProblem = async(req,res)=>{
     if(!allProblem){
        return res.send("No Problem found")
     }
-    res.status(201).send(allProblem);
+    res.status(200).send(allProblem);
     }catch(err){
     res.status(400).send('Error occured: '+err);
     }
