@@ -7,10 +7,7 @@ const { checkMandatory } = require("../utils/validator");
 
 const createProblem = async (req, res) => {
   try {
-    if (req.user.role != "admin") {
-      throw new Error("Only admin have access to create a Problem");
-    }
-
+   
     checkMandatory(
       req.body,
       "title",
@@ -97,7 +94,7 @@ const deleteProblem = async (req, res) => {
     }
   };
   
-const getProblem = async (req,res)=>{
+const getProblembyId = async (req,res)=>{
 try{
 const id = req.params.id;
 const foundProblem = await Problem.findById(id);
@@ -123,5 +120,5 @@ const getAllProblem = async(req,res)=>{
 }
 
 
-module.exports = { createProblem, updateProblem,deleteProblem,getProblem,getAllProblem };
+module.exports = { createProblem, updateProblem,deleteProblem,getProblembyId,getAllProblem };
   

@@ -41,14 +41,26 @@ const ProblemSchema  = new mongoose.Schema({
   codeFunction: [
     {
       language: { type: String, required: true },
-      boilerPlate: { type: String, required: true }
+      initialCode: { type: String, required: true }
     }
   ],
   problemCreater: {
     type: Schema.Types.ObjectId,
     ref: 'user',
     required: true
-  }
+  },
+  referenceSolution:[
+    {
+      language:{
+        type:String,
+        required:true,
+      },
+      completeCode:{
+        type:String,
+        required:true,
+      }
+    }
+  ]
 }, {
   timestamps: true
 });

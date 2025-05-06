@@ -82,9 +82,7 @@ const profile = async(req,res)=>{
 
 const adminRegister=async(req,res)=>{
     try{
-        if(req.user.role!='admin'){
-            throw new Error("Only admin have access")
-        }
+        
         validate(req.body);
      
         const {emailId,password}=req.body;
