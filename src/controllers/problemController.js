@@ -1,13 +1,10 @@
 const user = require("../models/user");
 const Problem = require("../models/Problem");
 const { checkMandatory } = require("../utils/validator");
-
-
-
+const getIdByLanguage = require("../utils/ProblemUtlis");
 
 const createProblem = async (req, res) => {
   try {
-   
     checkMandatory(
       req.body,
       "title",
@@ -19,106 +16,141 @@ const createProblem = async (req, res) => {
       "codeFunction"
     );
 
-    const existing = await Problem.findOne({ title: req.body.title });
-    if (existing) {
-      throw new Error("Problem already exists");
+    const {
+      title,
+      description,
+      difficultyLevel,
+      hint,
+      tags,
+      constraints,
+      visibleTestCases,
+      hiddenTestCases,
+      codeFunction,
+      problemCreater,
+      referenceSolution,
+    } = req.body;
+
+    //need-
+
+    // source_code
+    // language_id
+    // stdin
+    // excepted_output
+
+    for (const { language, completeCode } of referenceSolution) {
+      const languageId = getIdByLanguage(language);
+
+      //batch format that we have to send to judge0
+
+      // "submissions": [
+      //   {
+      //   "source_code": "#include<"hello, %s\n\", name);\n  return 0;\n}",
+      //   "language_id": 150000,
+      //   "stdin": "world",
+      //   "expected_output": "hello, world"
+      // }
+      //   {
+      //     "language_id": 71,
+      //     "source_code": "print(\"hello from Python\")",
+      //     "stdin":"w2d2",
+      //     "excepted_output":'edcderw'
+      //   }
+      // ]
+
+      const submissions = visibleTestCases.map((input, output) => ({
+        source_code: completeCode,
+        language_id: languageId,
+        stdin: input,
+        excepted_output: output,
+      }));
+
+      const submitResult = await submitBatch(submissions);
     }
-
-    req.body.problemCreater = req.user._id;
-    const savedProblem = await Problem.create(req.body);
-
-    res.status(201).json({
-      message: "Problem created successfully",
-      problem: savedProblem,
-    });
   } catch (err) {
     res.status(400).send("Error occured: " + err);
   }
 };
 
-
 const updateProblem = async (req, res) => {
-    try {
-      if (req.user.role != "admin") {
-        throw new Error("Only admin have access to update the Problem");
-      }
-  
-      const id = req.params.id;
-  
-      // Find the problem by ID and update it with validation
-      const problem = await Problem.findByIdAndUpdate(id, req.body, {
-        new: true,           // Return the updated document
-        runValidators: true, // Run the validation before updating
-      });
-  
-      // Check if the problem exists
-      if (!problem) {
-        throw new Error("Problem not found");
-      }
-  
-      res.status(200).json({
-        message: "Problem updated successfully",
-        problem: problem, // Send the updated problem back to the client
-      });
-  
-    } catch (err) {
-      console.log(err);
-      res.status(400).send("Error occurred: " + err.message);
+  try {
+    if (req.user.role != "admin") {
+      throw new Error("Only admin have access to update the Problem");
     }
-  };
- 
+
+    const id = req.params.id;
+
+    // Find the problem by ID and update it with validation
+    const problem = await Problem.findByIdAndUpdate(id, req.body, {
+      new: true, // Return the updated document
+      runValidators: true, // Run the validation before updating
+    });
+
+    // Check if the problem exists
+    if (!problem) {
+      throw new Error("Problem not found");
+    }
+
+    res.status(200).json({
+      message: "Problem updated successfully",
+      problem: problem, // Send the updated problem back to the client
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).send("Error occurred: " + err.message);
+  }
+};
 
 const deleteProblem = async (req, res) => {
-    try {
-      if (req.user.role != "admin") {
-        throw new Error("Only admin can delete the Problem");
-      }
-  
-      const id = req.params.id;
-  
-    
-      const problem = await Problem.findByIdAndDelete(id);
-  
-      // Check if the problem exists
-      if (!problem) {
-        throw new Error("Problem not found");
-      }
-  
-      res.status(204).send(
-         "Problem deleted successfully",
-      );
-  
-    } catch (err) {
-      console.log(err);
-      res.status(400).send("Error occurred: " + err.message);
+  try {
+    if (req.user.role != "admin") {
+      throw new Error("Only admin can delete the Problem");
     }
-  };
-  
-const getProblembyId = async (req,res)=>{
-try{
-const id = req.params.id;
-const foundProblem = await Problem.findById(id);
-if(!foundProblem){
-    throw new Error("Problem not found")
-}
-res.status(200).send(foundProblem);
-}catch(err){
-    res.status(400).send("error occured: " + err)
-}
-}
 
-const getAllProblem = async(req,res)=>{
-    try{
+    const id = req.params.id;
+
+    const problem = await Problem.findByIdAndDelete(id);
+
+    // Check if the problem exists
+    if (!problem) {
+      throw new Error("Problem not found");
+    }
+
+    res.status(204).send("Problem deleted successfully");
+  } catch (err) {
+    console.log(err);
+    res.status(400).send("Error occurred: " + err.message);
+  }
+};
+
+const getProblembyId = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const foundProblem = await Problem.findById(id);
+    if (!foundProblem) {
+      throw new Error("Problem not found");
+    }
+    res.status(200).send(foundProblem);
+  } catch (err) {
+    res.status(400).send("error occured: " + err);
+  }
+};
+
+const getAllProblem = async (req, res) => {
+  try {
     const allProblem = await Problem.find({});
-    if(!allProblem){
-       return res.send("No Problem found")
+    if (!allProblem) {
+      return res.send("No Problem found");
     }
     res.status(200).send(allProblem);
-    }catch(err){
-    res.status(400).send('Error occured: '+err);
-    }
-}
+  } catch (err) {
+    res.status(400).send("Error occured: " + err);
+  }
+};
 
-
-module.exports = { createProblem, updateProblem,deleteProblem,getProblembyId,getAllProblem };
-  
+module.exports = {
+  createProblem,
+  updateProblem,
+  deleteProblem,
+  getProblembyId,
+  getAllProblem,
+};
