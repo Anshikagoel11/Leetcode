@@ -6,8 +6,8 @@ const adminmiddleware = require('../middleware/adminmiddleware')
 
 //these 3 need admin access
 problemRouter.post("/create", tokenVerifyMiddleware ,adminmiddleware, createProblem)
-problemRouter.patch("/:id",tokenVerifyMiddleware,adminmiddleware,updateProblem)
-problemRouter.delete("/:id",tokenVerifyMiddleware,adminmiddleware,deleteProblem)
+problemRouter.put("/update/:id",tokenVerifyMiddleware,adminmiddleware,updateProblem)
+problemRouter.delete("/delete/:id",tokenVerifyMiddleware,adminmiddleware,deleteProblem)
 
 
 problemRouter.get("/:id",tokenVerifyMiddleware,getProblembyId)

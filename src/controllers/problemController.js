@@ -71,12 +71,10 @@ const createProblem = async (req, res) => {
   }
 };
 
+
 const updateProblem = async (req, res) => {
   try {
-    if (req.user.role != "admin") {
-      throw new Error("Only admin have access to update the Problem");
-    }
-
+   
     const id = req.params.id;
 
     // Find the problem by ID and update it with validation
@@ -100,6 +98,7 @@ const updateProblem = async (req, res) => {
   }
 };
 
+
 const deleteProblem = async (req, res) => {
   try {
     if (req.user.role != "admin") {
@@ -121,6 +120,7 @@ const deleteProblem = async (req, res) => {
     res.status(400).send("Error occurred: " + err.message);
   }
 };
+
 
 const getProblembyId = async (req, res) => {
   try {
