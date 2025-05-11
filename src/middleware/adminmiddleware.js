@@ -1,6 +1,6 @@
 
 
-const adminmiddleware = async(req,res,next){
+const adminmiddleware = async(req,res,next)=>{
     try {
         if (req.user.role != "admin") {
           throw new Error("Only admin have access to create a Problem");

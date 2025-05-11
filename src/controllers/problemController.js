@@ -1,7 +1,7 @@
 const user = require("../models/user");
 const Problem = require("../models/Problem");
 const { checkMandatory } = require("../utils/validator");
-const {getIdByLanguage,submitBatch} = require("../utils/ProblemUtlis");
+const {getIdByLanguage,submitBatch,submitToken,statusIdValue} = require("../utils/ProblemUtlis");
 
 const createProblem = async (req, res) => {
   try {
@@ -81,13 +81,46 @@ const createProblem = async (req, res) => {
 // ]
 
 const getResult = await submitToken(getToken);
+//now getResult have this array 
+//   "submissions": [
+//     {
+//       "language_id": 46,
+//       "stdout": "hello from Bash\n",
+//       "status_id": 3,
+//       "stderr": null,
+//       "token": "db54881d-bcf5-4c7b-a2e3-d33fe7e25de7"
+//     },
+//     {
+//       "language_id": 71,
+//       "stdout": "hello from Python\n",
+//       "status_id": 3,
+//       "stderr": null,
+//       "token": "ecc52a9b-ea80-4a00-ad50-4ab6cc3bb2a1"
+//     }
+//   ]
 
 
+for(const {status_id} of getResult){
+  if(status_id != 3){
+return  res.status(400).send(statusIdValue(status_id));
+  }else{
+     res.status(200).send("Accepted")
+  }
+}
+//aur aese hi fronted m hidden testcases pr result dikhane ke leye aese kr skte ki -  agar response me 3 nhi aaya toh vhi request rko do fronted ke taraf se api p and ui p vhi hiddentest case no,uske value dekha do 
     }
+
+    //now we can store in it our db
+    req.body.problemCreater = req.user._id;
+    await Problem.create(req.body);
+    res.status(201).send("Problem added successfully")
+    
   } catch (err) {
     res.status(400).send("Error occured: " + err);
   }
 };
+
+
 
 
 const updateProblem = async (req, res) => {

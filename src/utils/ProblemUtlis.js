@@ -2,6 +2,16 @@
 const axios = require('axios');
 require('dotenv').config();
 
+
+
+const waitOneSec = async(time)=>{
+    setTimeout(()=>{
+      console.log('waiting for a second')
+    },time)
+}
+
+
+
 const getIdByLanguage=(lang)=>{
     const languageWithId = {
         "c":50,
@@ -16,7 +26,8 @@ const getIdByLanguage=(lang)=>{
 
 
 
-const submitBatch = (submissions )=>{
+
+const submitBatch = async (submissions )=>{
 
 const options = {
   method: 'POST',
@@ -43,16 +54,17 @@ async function fetchData() {
 	}
 }
 
-return fetchData();
+return await fetchData();
 }
 
 
-const submitToken = (getToken)=>{
+
+
+const submitToken = async (getToken)=>{
 const tokens = getToken.map((obj)=>{
     return obj.token;
 })
 //now token is array of tokens 
-
 
 const options = {
   method: 'GET',
@@ -72,7 +84,16 @@ async function fetchData() {
 	try {
 		const response = await axios.request(options);
 		return response.data;
-        //after submission token result will come in this format 
+
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+
+while(true){
+const submitResult = await fetchData();
+ //after submitResult will come in this format 
 //{
 //   "submissions": [
 //     {
@@ -91,13 +112,36 @@ async function fetchData() {
 //     }
 //   ]
 // }
-	} catch (error) {
-		console.error(error);
-	}
+
+const result = submitResult.submissions.every((obj)=>obj.status_id>2)
+if(result) return  submitResult.submissions;
+
+await waitOneSec(1000);
+
 }
 
-fetchData();
+
 }
 
 
-module.exports={getIdByLanguage,submitBatch,submitToken};
+const statusIdValue = (statusId)=>{
+    const codeExecutionResult={
+  4: "Wrong Answer",
+  5: "Time Limit Exceeded",
+  6: "Compilation Error",
+  7: "Runtime Error (SIGSEGV)",
+  8: "Runtime Error (SIGXFSZ)",
+  9: "Runtime Error (SIGFPE)",
+  10: "Runtime Error (SIGABRT)",
+  11: "Runtime Error (NZEC)",
+  12: "Runtime Error (Other)",
+  13: "Internal Error",
+  14: "Exec Format Error"
+    }
+    return codeExecutionResult[statusId];
+}
+
+
+
+
+module.exports={getIdByLanguage,submitBatch,submitToken,statusIdValue};
