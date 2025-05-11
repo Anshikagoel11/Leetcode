@@ -1,6 +1,6 @@
 
 const axios = require('axios');
-
+require('dotenv').config();
 
 const getIdByLanguage=(lang)=>{
     const languageWithId = {
@@ -25,7 +25,7 @@ const options = {
     base64_encoded: 'true'
   },
   headers: {
-    'x-rapidapi-key': '0d06a704a2msha80d5bafcf3f455p1d5167jsn8e6166b29a91',
+    'x-rapidapi-key': process.env.judge0_key,
     'x-rapidapi-host': 'judge0-ce.p.rapidapi.com',
     'Content-Type': 'application/json'
   },
@@ -63,7 +63,7 @@ const options = {
     fields: '*'
   },
   headers: {
-    'x-rapidapi-key': 'Sign Up for Key',
+    'x-rapidapi-key': process.env.judge0_key,
     'x-rapidapi-host': 'judge0-ce.p.rapidapi.com'
   }
 };
