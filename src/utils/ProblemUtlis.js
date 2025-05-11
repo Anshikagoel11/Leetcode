@@ -33,7 +33,7 @@ const options = {
   method: 'POST',
   url: 'https://judge0-ce.p.rapidapi.com/submissions/batch',
   params: {
-    base64_encoded: 'true'
+    base64_encoded: 'false'
   },
   headers: {
     'x-rapidapi-key': process.env.judge0_key,
@@ -71,7 +71,7 @@ const options = {
   url: 'https://judge0-ce.p.rapidapi.com/submissions/batch',
   params: {
     tokens: tokens.join(','),
-    base64_encoded: 'true',
+    base64_encoded: 'false',
     fields: '*'
   },
   headers: {

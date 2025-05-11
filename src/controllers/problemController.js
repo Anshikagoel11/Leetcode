@@ -3,6 +3,8 @@ const Problem = require("../models/Problem");
 const { checkMandatory } = require("../utils/validator");
 const {getIdByLanguage,submitBatch,submitToken,statusIdValue} = require("../utils/ProblemUtlis");
 
+
+
 const createProblem = async (req, res) => {
   try {
     checkMandatory(
@@ -13,7 +15,9 @@ const createProblem = async (req, res) => {
       "tags",
       "visibleTestCases",
       "hiddenTestCases",
-      "codeFunction"
+      "codeFunction",
+     "referenceSolution",
+    
     );
 
     const {
@@ -62,7 +66,7 @@ const createProblem = async (req, res) => {
         source_code: completeCode,
         language_id: languageId,
         stdin: testcase.input,
-        excepted_output: testcase.output,
+        excepted_output : testcase.output,
       }));
 
       //now submit it code 
@@ -74,9 +78,6 @@ const createProblem = async (req, res) => {
 //   },
 //   {
 //     "token": "ecc52a9b-ea80-4a00-ad50-4ab6cc3bb2a1"
-//   },
-//   {
-//     "token": "1b35ec3b-5776-48ef-b646-d5522bdeb2cc"
 //   }
 // ]
 
@@ -102,9 +103,9 @@ const getResult = await submitToken(getToken);
 
 for(const {status_id} of getResult){
   if(status_id != 3){
-return  res.status(400).send(statusIdValue(status_id));
+     return res.status(400).send(statusIdValue(status_id));
   }else{
-     res.status(200).send("Accepted")
+    console.log("Accepted")
   }
 }
 //aur aese hi fronted m hidden testcases pr result dikhane ke leye aese kr skte ki -  agar response me 3 nhi aaya toh vhi request rko do fronted ke taraf se api p and ui p vhi hiddentest case no,uske value dekha do 
@@ -119,8 +120,6 @@ return  res.status(400).send(statusIdValue(status_id));
     res.status(400).send("Error occured: " + err);
   }
 };
-
-
 
 
 const updateProblem = async (req, res) => {
