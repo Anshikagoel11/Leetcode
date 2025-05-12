@@ -103,7 +103,7 @@ const getResult = await submitToken(getToken);
 
 for(const {status_id} of getResult){
   if(status_id != 3){
-     return res.status(400).send(statusIdValue(status_id));
+     return res.status(400).send("No a valid data for Problem");
   }else{
     console.log("Accepted")
   }
@@ -125,44 +125,104 @@ for(const {status_id} of getResult){
 const updateProblem = async (req, res) => {
   try {
    
-    const id = req.params.id;
+    const {id} = req.params;
+   if(!id){
+    return res.status(400).send("No id found")
+   }
+
+   const problem = await Problem.findById(id);
+if(!problem){
+  return res.status(500).send("No problem found")
+}
+
+    checkMandatory(
+      req.body,
+      "title",
+      "description",
+      "difficultyLevel",
+      "tags",
+      "visibleTestCases",
+      "hiddenTestCases",
+      "codeFunction",
+     "referenceSolution",
+    
+    );
+
+    const {
+      title,
+      description,
+      difficultyLevel,
+      hint,
+      tags,
+      constraints,
+      visibleTestCases,
+      hiddenTestCases,
+      codeFunction,
+      problemCreater,
+      referenceSolution,
+    } = req.body;
+
+    for (const { language, completeCode } of referenceSolution) {
+      const languageId = getIdByLanguage(language);
+
+      //create batch submission
+      const submissions = visibleTestCases.map((testcase) => ({
+        source_code: completeCode,
+        language_id: languageId,
+        stdin: testcase.input,
+        excepted_output : testcase.output,
+      }));
+
+      //now submit it code 
+      const getToken = await submitBatch(submissions);
+
+const getResult = await submitToken(getToken);
+
+
+for(const {status_id} of getResult){
+  if(status_id != 3){
+     return res.status(400).send("No a valid data for Problem");
+  }else{
+    console.log("Accepted")
+  }
+}
+    }
+
+    //now we can store in it our db
+    req.body.problemCreater = req.user._id;
 
     // Find the problem by ID and update it with validation
-    const problem = await Problem.findByIdAndUpdate(id, req.body, {
+    const newProblem = await Problem.findByIdAndUpdate(id, req.body, {
       new: true, // Return the updated document
       runValidators: true, // Run the validation before updating
     });
 
-    // Check if the problem exists
-    if (!problem) {
-      throw new Error("Problem not found");
-    }
-
     res.status(200).json({
       message: "Problem updated successfully",
-      problem: problem, // Send the updated problem back to the client
+      problem: problem,
     });
   } catch (err) {
     console.log(err);
     res.status(400).send("Error occurred: " + err.message);
   }
-};
+}
 
 
 const deleteProblem = async (req, res) => {
   try {
-    if (req.user.role != "admin") {
-      throw new Error("Only admin can delete the Problem");
-    }
 
-    const id = req.params.id;
+      const {id} = req.params;
+   if(!id){
+    return res.status(400).send("No id found")
+   }
 
-    const problem = await Problem.findByIdAndDelete(id);
+   const problem = await Problem.findById(id);
+if(!problem){
+  return res.status(500).send("No problem found")
+}
+    
 
-    // Check if the problem exists
-    if (!problem) {
-      throw new Error("Problem not found");
-    }
+    await Problem.findByIdAndDelete(id);
 
     res.status(204).send("Problem deleted successfully");
   } catch (err) {
@@ -174,11 +234,17 @@ const deleteProblem = async (req, res) => {
 
 const getProblembyId = async (req, res) => {
   try {
-    const id = req.params.id;
+     const {id} = req.params;
+   if(!id){
+    return res.status(400).send("No id found")
+   }
+
+   const problem = await Problem.findById(id);
+if(!problem){
+  return res.status(500).send("No problem found")
+}
+
     const foundProblem = await Problem.findById(id);
-    if (!foundProblem) {
-      throw new Error("Problem not found");
-    }
     res.status(200).send(foundProblem);
   } catch (err) {
     res.status(400).send("error occured: " + err);

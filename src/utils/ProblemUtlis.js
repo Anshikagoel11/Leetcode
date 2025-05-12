@@ -26,7 +26,6 @@ const getIdByLanguage=(lang)=>{
 
 
 
-
 const submitBatch = async (submissions )=>{
 
 const options = {
@@ -56,8 +55,6 @@ async function fetchData() {
 
 return await fetchData();
 }
-
-
 
 
 const submitToken = async (getToken)=>{
@@ -140,8 +137,6 @@ const statusIdValue = (statusId)=>{
     }
     return codeExecutionResult[statusId];
 }
-
-
 
 
 module.exports={getIdByLanguage,submitBatch,submitToken,statusIdValue};
