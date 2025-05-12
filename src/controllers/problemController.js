@@ -263,10 +263,42 @@ const getAllProblem = async (req, res) => {
   }
 };
 
+
+const filterProblems = async (req, res) => {
+  try {
+    const { difficultyLevel, tags } = req.query;
+
+    const filter = {};
+
+    // Add difficultyLevel to filter if provided
+    if (difficultyLevel) {
+      filter.difficultyLevel = difficultyLevel;
+    }
+
+    // Add tags filter if provided (assumes tags are stored as an array in the DB)
+    if (tags) {
+      // Accept comma-separated string and convert it to array
+      const tagsArray = tags.split(",").map((tag) => tag.trim());
+      filter.tags = { $all: tagsArray }; // Match problems that include all specified tags
+    }
+
+    const filteredProblems = await Problem.find(filter);
+
+    if (filteredProblems.length === 0) {
+      return res.status(404).send("No problems match the filter criteria.");
+    }
+
+    res.status(200).json(filteredProblems);
+  } catch (err) {
+    res.status(400).send("Error while filtering problems: " + err.message);
+  }
+};
+
 module.exports = {
   createProblem,
   updateProblem,
   deleteProblem,
   getProblembyId,
   getAllProblem,
+  filterProblems
 };
