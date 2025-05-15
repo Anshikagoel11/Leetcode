@@ -41,6 +41,10 @@ const createProblem = async (req, res) => {
     // stdin
     // excepted_output
 
+    const ques = await Problem.findOne({title:title});
+    if(ques){
+      return res.status(400).send("Problem already exists")
+    }
     for (const { language, completeCode } of referenceSolution) {
       const languageId = getIdByLanguage(language);
 
@@ -239,7 +243,7 @@ const getProblembyId = async (req, res) => {
     return res.status(400).send("No id found")
    }
 
-   const problem = await Problem.findById(id);
+   const problem = await Problem.findById(id).select('title description difficultyLevel hint tags constraints visibleTestCases codeFunction referenceSolution ');
 if(!problem){
   return res.status(500).send("No problem found")
 }
@@ -253,7 +257,7 @@ if(!problem){
 
 const getAllProblem = async (req, res) => {
   try {
-    const allProblem = await Problem.find({});
+    const allProblem = await Problem.find({}).select('title difficultyLevel tags _id');
     if (!allProblem) {
       return res.send("No Problem found");
     }
@@ -282,7 +286,7 @@ const filterProblems = async (req, res) => {
       filter.tags = { $all: tagsArray }; // Match problems that include all specified tags
     }
 
-    const filteredProblems = await Problem.find(filter);
+    const filteredProblems = await Problem.find(filter).select('title difficultyLevel tags');
 
     if (filteredProblems.length === 0) {
       return res.status(404).send("No problems match the filter criteria.");
@@ -293,6 +297,8 @@ const filterProblems = async (req, res) => {
     res.status(400).send("Error while filtering problems: " + err.message);
   }
 };
+
+
 
 module.exports = {
   createProblem,

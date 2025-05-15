@@ -1,7 +1,8 @@
 const express = require('express')
 const main = require("./src/config/db")
 const authRouter=require("./src/routes/userAuth");
-const problemRouter=require("./src/routes/problemCreator")
+const problemRouter = require("./src/routes/problemRouter")
+const submitRouter = require("./src/routes/submitProblem")
 const redisClient = require('./src/config/redis');
 const cookieParser = require('cookie-parser');
 
@@ -30,5 +31,4 @@ connection();
 
 app.use("/user",authRouter);
 app.use("/problem",problemRouter);
-
-
+app.use("/submission",submitRouter);

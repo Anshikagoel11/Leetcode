@@ -18,7 +18,6 @@ const submissionSchema = new mongoose.Schema({
     },
     title:{
          type:String,
-        required:true
     },
     language:{
          type:String,
@@ -28,8 +27,9 @@ const submissionSchema = new mongoose.Schema({
     status:{
         type:String,
         required:true,
+        default:'pending'
     },
-    executionTime:{
+   runtime:{
         type:Number,
         default:0
     },
@@ -50,3 +50,7 @@ const submissionSchema = new mongoose.Schema({
       default:0
     }
 },{timestamps:true})
+
+
+const Submission = mongoose.model('Submission', submissionSchema);
+module.exports = Submission;
